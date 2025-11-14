@@ -1,0 +1,34 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+    "torch>=2.9",
+    "nvidia-cutlass-dsl==4.3.0.dev0"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "leet_cuda_cutedsl"
+version = "0.0.1"
+description = "leet cuda with cutedsl."
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Rhys-Q", email = "1826249828@qq.com" }
+]
+requires-python = "==3.12.0"
+
+[project.urls]
+Homepage = "https://github.com/Rhys-Q/leet_cuda_cutedsl"
+Source = "https://github.com/Rhys-Q/leet_cuda_cutedsl"
+Issues = "https://github.com/Rhys-Q/leet_cuda_cutedsl/issues"
+
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[[tool.uv.index]]
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+default = true
