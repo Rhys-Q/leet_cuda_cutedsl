@@ -6,7 +6,7 @@ import os
 import argparse
 import torch
 
-
+import logging
 @dataclass
 class InputCase:
     inputs: tuple
@@ -65,12 +65,15 @@ class KernelBenchmark:
             assert (
                 kernel.implement_name() in IMPLEMENT_LIST
             ), f"implement name {kernel.implement_name()} not in {IMPLEMENT_LIST}"
-        torch_impl = next(
+        self.torch_impl = next(
             (impl for impl in kernel_impl if impl.implement_name() == "torch"), None
         )
-        assert torch_impl is not None, "must provide torch as reference implementation"
+        if self.torch_impl is None:
+            logging.warning(
+                "No implementation with implement_name=='torch' found. Accuracy check skip."
+            )
         other_impls = [impl for impl in kernel_impl if impl.implement_name() != "torch"]
-        self.kernel_impl = [torch_impl] + other_impls
+        self.kernel_impl = [self.torch_impl] + other_impls
         self.input_cases = input_cases
 
     def _check_accuracy(self):
@@ -119,7 +122,8 @@ class KernelBenchmark:
         for input_case in self.input_cases:
             case_result = {"input_case": input_case.name, "perf": []}
             for impl in self.kernel_impl:
-                times = []
+                if impl is None:
+                    continue
                 for _ in range(warmup):
                     _ = impl.infer(input_case.inputs)
                 start = time.time()
@@ -140,7 +144,13 @@ class KernelBenchmark:
         """
         Run both accuracy and performance tests for all input_cases and return the results.
         """
-        accuracy_results = self._check_accuracy()
+        if self.torch_impl is None:
+            logging.warning(
+                "No reference implementation found. Only performance benchmark will be run."
+            )
+            accuracy_results = []
+        else:
+            accuracy_results = self._check_accuracy()
         perf_results = self._benchmark(repeat=repeat, warmup=warmup)
         return {"accuracy": accuracy_results, "performance": perf_results}
 
