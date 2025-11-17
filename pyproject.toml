@@ -2,8 +2,7 @@
 requires = [
     "setuptools>=61.0",
     "wheel",
-    "torch>=2.9",
-    "nvidia-cutlass-dsl==4.3.0.dev0"
+    "torch"
 ]
 build-backend = "setuptools.build_meta"
 

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import json
 import os
-
+import argparse
 import torch
 
 
@@ -160,6 +160,12 @@ def benchmark(
     input_cases: list[InputCase],
     save_path: str = None,
 ):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--impl', type=str, default="all", help='Number of repetitions for benchmarking')
+    args = parser.parse_args()
+    if args.impl != "all":
+        kernel_impls = [impl for impl in kernel_impls if impl.implement_name() == args.impl]
+        assert len(kernel_impls) > 0, f"No implementation found for {args.impl}"
     bench = KernelBenchmark(
         kernel_impl=kernel_impls,
         input_cases=input_cases,
